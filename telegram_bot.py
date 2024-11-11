@@ -9,8 +9,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()  # Load environment variables from .env file
-
-API_KEY = os.getenv('API_KEY')  # Get the API key from the environment variable
+API_KEY = os.environ.get("API_KEY")
 
 # Function to fetch weather data
 def get_weather(location):
@@ -46,7 +45,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Access the Telegram bot token
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TOKEN = os.environ.get("TOKEN")
+
 
 # List of sample quotes
 quotes = [
