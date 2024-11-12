@@ -9,7 +9,9 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()  # Load environment variables from .env file
+
 API_KEY = os.environ.get("API_KEY")
+TOKEN = os.environ.get("TOKEN")
 
 # Function to fetch weather data
 def get_weather(location):
@@ -45,8 +47,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Access the Telegram bot token
-TOKEN = os.environ.get("TOKEN")
-
 
 # List of sample quotes
 quotes = [
@@ -255,6 +255,47 @@ async def set_language(update: Update, context: CallbackContext):
             "Please type either 'EN' for English or 'TR' for Turkish to proceed."
         )
 
+async def help_command(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    if user_languages[chat_id]:
+        user_language=user_languages[chat_id]
+
+        if user_language == "EN":
+            help_message = (
+                "Here's what I can do:\n"
+                "- Send inspiring quotes (type 'quote')\n"
+                "- Share the weather updates (use /weather <location>)\n"
+                "- Answer basic greetings and questions\n\n"
+                "Type your command or question, and I'll do my best to assist!"
+            )
+        elif user_language == "TR":
+            help_message = (
+                "İşte yapabileceklerim:\n"
+                '- İlham verici alıntılar gönderebilirim (cümle içinde "atasöz" yazın)\n'
+                "- Hava durumu güncellemelerini paylaş (kullanım: /weather <konum>)\n"
+                "- Temel selamlamalara ve sorulara yanıt verebilirim\n\n"
+                "Komutunuzu veya sorunuzu yazın, size yardımcı olmaktan mutluluk duyarım!"
+            )
+    else:
+        # Prompt the user to choose a language if not set
+        help_message = (
+            "Please set your language first by typing 'EN' for English or 'TR' for Turkish.\n"
+            "Öncelikle sohbet dilini seçmek için 'EN' veya 'TR' yazın."
+        )
+
+    # Send the help message
+    await update.message.reply_text(help_message)
+
+
+def unsubscribe(update, context):
+    chat_id = update.message.chat_id
+    if chat_id in subscribed_users:
+        subscribed_users.remove(chat_id)  # Remove the chat_id from the set
+        update.message.reply_text("You have successfully unsubscribed.")
+    else:
+        update.message.reply_text("You were not subscribed.")
+
+
 # Define your main function
 def main():
     # Set up the bot
@@ -263,6 +304,8 @@ def main():
     # Add handlers
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("weather", weather))
+    app.add_handler(CommandHandler("help", help_command))  # Add the /help handler
+    app.add_handler(CommandHandler("unsubscribe", unsubscribe))
     
     # This handler listens for "EN" or "TR" messages only once after /start
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex("^(EN|TR)$"), set_language))
@@ -278,10 +321,10 @@ def main():
     scheduler.add_job(lambda: asyncio.run(send_quote(app)), 'cron', hour=14, minute=34)  # Adjust to your desired time
 
     # Add morning message job at 8:00 AM
-    scheduler.add_job(lambda: asyncio.run(send_morning_message(app)), 'cron', hour=8, minute=0)
+    scheduler.add_job(lambda: asyncio.run(send_morning_message(app)), 'cron', hour=5, minute=0)
 
     # Add good night message job at 10:00 PM (22:00)
-    scheduler.add_job(lambda: asyncio.run(send_goodnight_message(app)), 'cron', hour=22, minute=0)
+    scheduler.add_job(lambda: asyncio.run(send_goodnight_message(app)), 'cron', hour=19, minute=0)
 
     scheduler.start()
 
