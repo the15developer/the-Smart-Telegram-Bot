@@ -263,18 +263,24 @@ async def help_command(update: Update, context: CallbackContext):
         if user_language == "EN":
             help_message = (
                 "Here's what I can do:\n"
-                "- Send inspiring quotes (type 'quote')\n"
-                "- Share the weather updates (use /weather <location>)\n"
-                "- Answer basic greetings and questions\n\n"
-                "Type your command or question, and I'll do my best to assist!"
+                "- Send inspiring quotes (type 'quote') 🤓\n"
+                "- Share the weather updates 🌤️ (use /weather location)\n"
+                "- Answer basic greetings and questions 😎\n"
+                "- Also I will send you good morning and good night messages and one inspiring quote per day 😌\n\n"
+                "Type your command or question, and I'll do my best to assist! 🥰\n"
+                'To unsubscribe 😠: type "/unsubscribe" \n'
+                '🥰🥰🥰🥰🥰🥰🥰🥰🥰🥰🥰'
             )
         elif user_language == "TR":
             help_message = (
-                "İşte yapabileceklerim:\n"
-                '- İlham verici alıntılar gönderebilirim (cümle içinde "atasöz" yazın)\n'
-                "- Hava durumu güncellemelerini paylaş (kullanım: /weather <konum>)\n"
-                "- Temel selamlamalara ve sorulara yanıt verebilirim\n\n"
-                "Komutunuzu veya sorunuzu yazın, size yardımcı olmaktan mutluluk duyarım!"
+                "İşte yapabileceklerim:\n" 
+                '- İlham verici alıntılar gönderebilirim 🤓 (cümle içinde "atasöz" yazın)\n'
+                "- Hava durumu güncellemelerini paylaşabilirim 🌤️ (kullanım: /weather konum)\n"
+                "- Temel selamlamalara ve sorulara yanıt verebilirim 😎\n"
+                "- Ayrıca günaydın ve iyi geceler mesajları ve gün içinde ilham verici bir atasöz atarım 😌\n\n"
+                "Komutunuzu veya sorunuzu yazın, size yardımcı olmaktan mutluluk duyarım! 🥰\n"
+                'Aboneliği iptal etmek için 😠: "/unsubscribe" yazın \n'
+                '🥰🥰🥰🥰🥰🥰🥰🥰🥰🥰🥰'
             )
     else:
         # Prompt the user to choose a language if not set
@@ -287,13 +293,13 @@ async def help_command(update: Update, context: CallbackContext):
     await update.message.reply_text(help_message)
 
 
-def unsubscribe(update, context):
+async def unsubscribe(update, context):
     chat_id = update.message.chat_id
     if chat_id in subscribed_users:
         subscribed_users.remove(chat_id)  # Remove the chat_id from the set
-        update.message.reply_text("You have successfully unsubscribed.")
+        await update.message.reply_text("You have successfully unsubscribed.")
     else:
-        update.message.reply_text("You were not subscribed.")
+        await update.message.reply_text("You were not subscribed.")
 
 
 # Define your main function
@@ -318,7 +324,7 @@ def main():
 
     # Scheduler to send a quote daily at a specified time (18:19)
     # Add the job to the scheduler
-    scheduler.add_job(lambda: asyncio.run(send_quote(app)), 'cron', hour=14, minute=34)  # Adjust to your desired time
+    scheduler.add_job(lambda: asyncio.run(send_quote(app)), 'cron', hour=8, minute=30)  # Adjust to your desired time
 
     # Add morning message job at 8:00 AM
     scheduler.add_job(lambda: asyncio.run(send_morning_message(app)), 'cron', hour=5, minute=0)
