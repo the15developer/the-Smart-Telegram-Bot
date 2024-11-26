@@ -46,9 +46,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Access the Telegram bot token
 
-# List of sample quotes
+
+
 quotes = [
     "The best way to predict the future is to create it. - Peter Drucker",
     "Success is not the key to happiness. Happiness is the key to success.",
@@ -100,21 +100,21 @@ atasozler = [
 # List to store chat IDs of users who start the bot
 subscribed_users = set()
 user_languages = {} 
-language = None  # Define language as a global variable
+language = None 
 
-# Define your send_quote function (ensure it is async)
+
 async def send_quote(app: Application):
     print("Sending quote...")
     for chat_id in subscribed_users:
-        # Check the language of the user
+        
         user_language = user_languages.get(chat_id, None)
-        # Select the appropriate list of quotes based on the language
+        
         if user_language == "EN":
             quote = random.choice(quotes)  # English quotes
         elif user_language == "TR":
             quote = random.choice(atasozler)  # Turkish quotes
         else:
-            # Default to English quotes if no language is selected
+            
             quote = random.choice(quotes)
 
         # Send the selected quote to the user
@@ -131,7 +131,7 @@ async def send_morning_message(app):
            if user_language=='TR':
               await app.bot.send_message(chat_id=chat_id, text=message_tr)
 
-# Function to send a good night message
+
 async def send_goodnight_message(app):
     message_en = "Good night! 🌙 Wishing you peaceful dreams!"
     message_tr = "İyi geceler! 🌙 Huzurlu rüyalar dilerim!"
@@ -202,7 +202,7 @@ async def keyword_response(update: Update, context: CallbackContext):
 
     
 
-# Define your start function
+
 async def start(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     if chat_id not in subscribed_users:
@@ -217,18 +217,18 @@ async def start(update: Update, context: CallbackContext):
 # Define the /weather command function
 async def weather(update: Update, context: CallbackContext):
     if context.args:
-        location = " ".join(context.args)  # Get location from the command arguments
-        weather_info = get_weather(location)  # Fetch weather data
-        await update.message.reply_text(weather_info)  # Send weather info to the user
+        location = " ".join(context.args)  
+        weather_info = get_weather(location)  
+        await update.message.reply_text(weather_info) 
     else:
         await update.message.reply_text("Please provide a location. For example, /weather London")
 
-# Define the function to handle user language selection
+#
 async def set_language(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     user_first_name = update.message.from_user.first_name
     
-    # Only process language selection if it's not set
+  
     
     user_message = update.message.text.strip().upper()
     
@@ -283,7 +283,7 @@ async def help_command(update: Update, context: CallbackContext):
                 '🥰🥰🥰🥰🥰🥰🥰🥰🥰🥰🥰'
             )
     else:
-        # Prompt the user to choose a language if not set
+     
         help_message = (
             "Please set your language first by typing 'EN' for English or 'TR' for Turkish.\n"
             "Öncelikle sohbet dilini seçmek için 'EN' veya 'TR' yazın."
@@ -304,26 +304,25 @@ async def unsubscribe(update, context):
 
 # Define your main function
 def main():
-    # Set up the bot
+   
     app = Application.builder().token(TOKEN).build()
 
-    # Add handlers
+    
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("weather", weather))
-    app.add_handler(CommandHandler("help", help_command))  # Add the /help handler
+    app.add_handler(CommandHandler("help", help_command))  
     app.add_handler(CommandHandler("unsubscribe", unsubscribe))
     
     # This handler listens for "EN" or "TR" messages only once after /start
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex("^(EN|TR)$"), set_language))
 
-    # This handler responds to general keywords after language selection
+    
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, keyword_response))
 
     # Create the scheduler
     scheduler = BackgroundScheduler()
 
-    # Scheduler to send a quote daily at a specified time (18:19)
-    # Add the job to the scheduler
+    
     scheduler.add_job(lambda: asyncio.run(send_quote(app)), 'cron', hour=8, minute=30)  # Adjust to your desired time
 
     # Add morning message job at 8:00 AM
@@ -334,7 +333,7 @@ def main():
 
     scheduler.start()
 
-    # Run the bot
+   
     app.run_polling()
 
 if __name__ == '__main__':
