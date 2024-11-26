@@ -6,4 +6,4 @@ The bot is subject to continuous development.
 
 The bot is deployed on **Heroku** and ready to use !
 
-[t.me/smart_chit_chat_bot]
+!t.me/smart_chit_chat_bot
